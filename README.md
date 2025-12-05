@@ -45,8 +45,8 @@ To structure the dataset effectively, I designed a schema and built an Entity Re
 ![ERD_Image](images/final_erd_cpe_dashboard.drawio.png)
 
 
-# 🔍 The dashboard
-![1_dashboard](images/1.png)
+# 🔍 The dashboard 
+![1_dashboard](images/1.png) 
 The design centers on a responsive left side pane that allows users to quickly navigate to detail pages via interactive buttons and bookmarks, all while continuously displaying key  data.
 
 ![2_dashboard](images/2.png)
