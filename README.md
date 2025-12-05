@@ -58,10 +58,7 @@ These views allow users to investigate key details, such as which discounts bene
 The true power of this dashboard lies in its **interactivity** using Power BI's features.
 Users can interact with specific data points, such as clicking on the "Characidés" sub-category to **instantly sync and filter all other visuals across the report**, enabling rapid and efficient extraction of granular data.
 
-*before clicking:*![6_dashboard](images/6.png)
-
-
-*after clicking:*![7_dashboard](images/7.png)
+![gif_dashboard_2](images/cpe_dashboard_2.gif)
 
 
 
