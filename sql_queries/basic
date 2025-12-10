@@ -1,22 +1,83 @@
 -- What is the average unit price (prix) of all products currently listed in the inventory?
 SELECT 
-    ROUND(AVG(prix),2)
+    ROUND(AVG(prix),2) AS avg_prix
 FROM produit;
 
+
 -- List the prenom and nom of all commercials, and the region name they belong to.
+SELECT 
+    prenom,
+    nom,
+    region.region
+FROM commercial
+LEFT JOIN region ON commercial.region_id = region.region_id
+
 
 -- Identify the most expensive product (nom_produit) currently offered.
+SELECT
+    prix,
+    nom_produit,
+    nom_scientifique
+FROM produit
+WHERE prix IS NOT NULL
+ORDER BY prix DESC
+LIMIT 1;
+
 
 -- Find the total number of distinct regions covered by the sales team.
+SELECT
+    DISTINCT COUNT(region)
+FROM region;
+
 
 -- How many orders (commande_id) were placed on a specific date (e.g., date_commande = '2023-10-15')?
+SELECT 
+    COUNT(commande_id)
+FROM commande
+WHERE date_commande = '2025-09-04';
+
 
 -- Display the client_id, code_magasin, and associated commercial_id for quick client lookup.
+SELECT
+    client_id,
+    code_magasin,
+    client.commercial_id,
+    commercial.prenom,
+    commercial.nom
+FROM client
+LEFT JOIN commercial ON client.commercial_id = commercial.commercial_id
+
 
 -- List all product categories (categorie) to understand the breadth of the offering.
+SELECT 
+    categorie
+FROM categorie;
+
+
+-- List all product sub-categories (sous_categorie) to understand the breadth of the offering.
+SELECT 
+    sous_categorie
+FROM sous_categorie;
 
 -- Find the total amount of money paid (sum of prix_total) across all orders in the commande_detail table.
+SELECT
+    SUM(prix_total)
+FROM commande_detail;
+
 
 -- Which livraison (delivery) method is available with livraison_id = 11?
+SELECT *
+FROM livraison
+WHERE livraison_id = 11
+
 
 -- Retrieve the nom_produit and its scientific name for products belonging to the sub-category with sous_categorie_id 10.
+SELECT
+    produit.sous_categorie_id,
+    sous_categorie,
+    nom_produit,
+    nom_scientifique,
+    prix
+FROM produit
+LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
+WHERE produit.sous_categorie_id = 10;
