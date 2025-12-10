@@ -103,3 +103,4 @@ ALTER TABLE commande_detail OWNER to postgres;
 ALTER TABLE produit OWNER to postgres;
 ALTER TABLE sous_categorie OWNER to postgres;
 ALTER TABLE categorie OWNER to postgres;
+
