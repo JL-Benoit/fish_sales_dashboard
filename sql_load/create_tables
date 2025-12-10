@@ -1,42 +1,74 @@
--- Create company_dim table with primary key
-CREATE TABLE public.company_dim
+-- Create client table with primary key
+CREATE TABLE public.client
 (
-    company_id INT PRIMARY KEY,
-    name TEXT,
-    link TEXT,
-    link_google TEXT,
-    thumbnail TEXT
+    client_id INT PRIMARY KEY,
+    code_magasin VARCHAR(255),
+    addresse VARCHAR(255),
+    code_postal VARCHAR(255),
+    email VARCHAR(255),
+    FOREIGN KEY (commercial_id) REFERENCES public.commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES public.livraison (livraison_id)
 );
 
--- Create skills_dim table with primary key
-CREATE TABLE public.skills_dim
+-- Create commercial table with primary key
+CREATE TABLE public.commercial
 (
-    skill_id INT PRIMARY KEY,
-    skills TEXT,
-    type TEXT
+    commercial_id INT PRIMARY KEY,
+    prenom VARCHAR (255),
+    nom VARCHAR(255),
+    FOREIGN KEY (region_id) REFERENCES public.region (region_id)
 );
 
--- Create job_postings_fact table with primary key
-CREATE TABLE public.job_postings_fact
+-- Create livraison table with primary key
+CREATE TABLE public.livraison
 (
-    job_id INT PRIMARY KEY,
-    company_id INT,
-    job_title_short VARCHAR(255),
-    job_title TEXT,
-    job_location TEXT,
-    job_via TEXT,
-    job_schedule_type TEXT,
-    job_work_from_home BOOLEAN,
-    search_location TEXT,
-    job_posted_date TIMESTAMP,
-    job_no_degree_mention BOOLEAN,
-    job_health_insurance BOOLEAN,
-    job_country TEXT,
-    salary_rate TEXT,
-    salary_year_avg NUMERIC,
-    salary_hour_avg NUMERIC,
-    FOREIGN KEY (company_id) REFERENCES public.company_dim (company_id)
+    livraison_id INT PRIMARY KEY,
+    livraison VARCHAR (25)
 );
+
+-- Create region table with primary key
+CREATE TABLE public.region
+(
+    region_id INT PRIMARY KEY,
+    region VARCHAR (255)
+);
+
+-- Create commande table with primary key
+CREATE TABLE public.commande
+(
+    commande_id INT PRIMARY KEY,
+    date_commande DATE,
+    FOREIGN KEY (client_id) REFERENCES public.client (client_id),
+    FOREIGN KEY (commercial_id) REFERENCES public.commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES public.livraison (livraison_id)
+);
+
+-- Create commande table with primary key
+CREATE TABLE public.commande_detail
+(
+    commande_detail_id INT PRIMARY KEY,
+    quantite INT,
+    prix_unitaire NUMBER,
+    remise NUMBER,
+    prix_total NUMBER,
+    FOREIGN KEY (commande_id) REFERENCES public.commande (commande_id),
+    FOREIGN KEY (produit_id) REFERENCES public.produit (produit_id)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- Create skills_job_dim table with a composite primary key and foreign keys
 CREATE TABLE public.skills_job_dim
