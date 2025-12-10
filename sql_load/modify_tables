@@ -41,7 +41,7 @@ WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy commande FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_commande.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy commercial FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_commercial.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy livraison FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_livraison.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
-\copy produits FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_produits.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+\copy produit FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_produits.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy region FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_region.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy sous_categorie FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_sous_categorie.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
 \copy categorie FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_categorie.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
