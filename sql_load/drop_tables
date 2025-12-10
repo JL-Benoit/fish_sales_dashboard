@@ -3,3 +3,35 @@ DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
 SET search_path TO public;
+
+DROP TABLE commande CASCADE;
+
+DROP TABLE client;
+
+-- Recreate the client table with the missing column in the correct order
+CREATE TABLE client
+(
+    client_id INT PRIMARY KEY,
+    commercial_id INT,
+    livraison_id INT,
+    code_magasin VARCHAR(255),
+    addresse VARCHAR(255),
+    code_postal VARCHAR(255),
+    num_telephone VARCHAR(255), -- CORRECT COLUMN ADDED HERE
+    email VARCHAR(255),
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
+    );
+
+
+CREATE TABLE commande
+(
+    commande_id INT PRIMARY KEY,
+    client_id INT,
+    commercial_id INT,
+    livraison_id INT,
+    date_commande DATE,
+    FOREIGN KEY (client_id) REFERENCES client (client_id),
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
+);
