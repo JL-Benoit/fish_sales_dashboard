@@ -1,0 +1,22 @@
+-- What is the average unit price (prix) of all products currently listed in the inventory?
+SELECT 
+    ROUND(AVG(prix),2)
+FROM produit;
+
+-- List the prenom and nom of all commercials, and the region name they belong to.
+
+-- Identify the most expensive product (nom_produit) currently offered.
+
+-- Find the total number of distinct regions covered by the sales team.
+
+-- How many orders (commande_id) were placed on a specific date (e.g., date_commande = '2023-10-15')?
+
+-- Display the client_id, code_magasin, and associated commercial_id for quick client lookup.
+
+-- List all product categories (categorie) to understand the breadth of the offering.
+
+-- Find the total amount of money paid (sum of prix_total) across all orders in the commande_detail table.
+
+-- Which livraison (delivery) method is available with livraison_id = 11?
+
+-- Retrieve the nom_produit and its scientific name for products belonging to the sub-category with sous_categorie_id 10.
