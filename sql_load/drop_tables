@@ -1,0 +1,8 @@
+-- 1. Drop the existing 'public' schema, forcing removal of all contents
+DROP SCHEMA public CASCADE;
+
+-- 2. Recreate the 'public' schema (required for psql/tools to function normally)
+CREATE SCHEMA public;
+
+-- 3. Update the search path to point to the newly created public schema
+SET search_path TO public;
