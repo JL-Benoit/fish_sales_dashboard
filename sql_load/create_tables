@@ -43,7 +43,7 @@ CREATE TABLE public.commande
     FOREIGN KEY (livraison_id) REFERENCES public.livraison (livraison_id)
 );
 
--- Create commande table with primary key
+-- Create commande detail table with primary key
 CREATE TABLE public.commande_detail
 (
     commande_detail_id INT PRIMARY KEY,
@@ -55,11 +55,30 @@ CREATE TABLE public.commande_detail
     FOREIGN KEY (produit_id) REFERENCES public.produit (produit_id)
 );
 
+-- Create product table with primary key
+CREATE TABLE public.produit
+(
+    produit_id INT PRIMARY KEY,
+    nom_produit VARCHAR(255),
+    nom_scientifique VARCHAR(255),
+    prix NUMBER,
+    FOREIGN KEY (sous_categorie_id) REFERENCES public.sous_categorie (sous_categorie_id)
+);
 
+-- Create sub category table with primary key
+CREATE TABLE public.sous_categorie
+(
+    sous_categorie_id INT PRIMARY KEY,
+    sous_categorie VARCHAR(255),
+    FOREIGN KEY (categorie_id) REFERENCES public.categorie (categorie_id)
+);
 
-
-
-
+-- Create category table with primary key
+CREATE TABLE public.categorie
+(
+    categorie_id INT PRIMARY KEY,
+    categorie VARCHAR(255)
+);
 
 
 
