@@ -93,6 +93,125 @@ CREATE TABLE categorie
 );
 
 
+
+
+
+
+
+-- ====================================================================
+-- 1. Create independent tables (Parent Tables for others)
+-- ====================================================================
+
+-- Create region table with primary key
+CREATE TABLE region
+(
+    region_id INT PRIMARY KEY,
+    region VARCHAR (255)
+);
+
+-- Create livraison table with primary key
+CREATE TABLE livraison
+(
+    livraison_id INT PRIMARY KEY,
+    livraison VARCHAR (25)
+);
+
+-- Create category table with primary key
+CREATE TABLE categorie
+(
+    categorie_id INT PRIMARY KEY,
+    categorie VARCHAR(255)
+);
+
+-- ====================================================================
+-- 2. Create second-tier tables (Referencing #1)
+-- ====================================================================
+
+-- Create commercial table with primary key
+CREATE TABLE commercial
+(
+    commercial_id INT PRIMARY KEY,
+    region_id INT,
+    prenom VARCHAR (255),
+    nom VARCHAR(255),
+    FOREIGN KEY (region_id) REFERENCES region (region_id)
+);
+
+-- Create sub category table with primary key
+CREATE TABLE sous_categorie
+(
+    sous_categorie_id INT PRIMARY KEY,
+    categorie_id INT,
+    sous_categorie VARCHAR(255),
+    FOREIGN KEY (categorie_id) REFERENCES categorie (categorie_id)
+);
+
+-- ====================================================================
+-- 3. Create third-tier tables (Referencing #1 & #2)
+-- ====================================================================
+
+-- Create client table with primary key
+CREATE TABLE client
+(
+    client_id INT PRIMARY KEY,
+    commercial_id INT,
+    livraison_id INT,
+    code_magasin VARCHAR(255),
+    addresse VARCHAR(255),
+    code_postal VARCHAR(255),
+    email VARCHAR(255),
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
+);
+
+-- Create product table with primary key
+CREATE TABLE produit
+(
+    produit_id VARCHAR(50) PRIMARY KEY,
+    sous_categorie_id INT,
+    nom_produit VARCHAR(255),
+    nom_scientifique VARCHAR(255),
+    prix NUMERIC,
+    FOREIGN KEY (sous_categorie_id) REFERENCES sous_categorie (sous_categorie_id)
+);
+
+-- ====================================================================
+-- 4. Create main transaction tables (Referencing #3)
+-- ====================================================================
+
+-- Create commande table with primary key
+CREATE TABLE commande
+(
+    commande_id INT PRIMARY KEY,
+    client_id INT,
+    commercial_id INT,
+    livraison_id INT,
+    date_commande DATE,
+    FOREIGN KEY (client_id) REFERENCES client (client_id),
+    -- FIX 1: Referenced the correct table (commercial)
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    -- FIX 1: Referenced the correct table (livraison)
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
+);
+
+-- Create commande detail table with primary key
+CREATE TABLE commande_detail
+(
+    commande_detail_id INT PRIMARY KEY,
+    commande_id INT,
+    produit_id VARCHAR(50),
+    quantite INT,
+    prix_unitaire NUMERIC, -- Changed NUMBER to NUMERIC/FLOAT for PostgreSQL
+    remise NUMERIC,
+    prix_total NUMERIC,
+    FOREIGN KEY (commande_id) REFERENCES commande (commande_id),
+    FOREIGN KEY (produit_id) REFERENCES produit (produit_id)
+);
+
+
+
+
+
 -- Set ownership of the tables to the postgres user
 ALTER TABLE client OWNER to postgres;
 ALTER TABLE commercial OWNER to postgres;
