@@ -1,0 +1,19 @@
+-- Use a Window Function (RANK()) to rank commercials based on their total revenue across all sales. Display the rank, nom, and total revenue.
+
+-- Determine the sales growth percentage (revenue change) between two periods (e.g., Q4 2023 vs. Q3 2023). (Requires date filtering and CTE/subquery).
+
+-- Using a Common Table Expression (CTE), find the client who placed their first order in a specific month (e.g., January 2024). Display the client's code_magasin and the date_commande.
+
+-- Identify the Top 3 regions where the average discount rate (remise) offered was the highest. (Indicates aggressive discounting).
+
+-- Find the total sales (sum of prix_total) for each commercial, broken down by the category of the products they sold. (Requires conditional aggregation or advanced joins).
+
+-- List the client_ids who have purchased products from at least three different regions (inferred through the commercial who handles them).
+
+-- For each region, find the product category that generates the highest total revenue (the 'best-selling category per region').
+
+-- Calculate the median unit price (prix_unitaire) of all items sold in the commande_detail table.
+
+-- Identify the product (produit_id, nom_produit) that is most often sold together with the product that has the highest overall sales quantity. (Prerequisite for market basket analysis - requires self-join on commande_detail).
+
+-- Write a query that shows the cumulative sales total (running sum of prix_total) for all orders handled by the commercial with the highest overall sales, ordered by date_commande. (Requires a Window Function and subquery).
