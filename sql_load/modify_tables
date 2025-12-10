@@ -1,0 +1,32 @@
+
+COPY client
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_client.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY commande_detail
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_commande_detail.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY commande
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_commande.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY commercial
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_commercial.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY livraison
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_livraison.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY produits
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_produits.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY region
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_region.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY sous_categorie
+FROM 'C:\Users\jeanb\Desktop\Data Analysis\fish_sales_dashboard\cpe_dashboard_csv_files\cpe_sous_categorie.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
