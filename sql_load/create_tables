@@ -1,82 +1,92 @@
 -- Create all the tables necessary
 
 -- Create client table with primary key
-CREATE TABLE public.client
+CREATE TABLE client
 (
     client_id INT PRIMARY KEY,
+    commercial_id INT,
+    livraison_id INT,
     code_magasin VARCHAR(255),
     addresse VARCHAR(255),
     code_postal VARCHAR(255),
     email VARCHAR(255),
-    FOREIGN KEY (commercial_id) REFERENCES public.commercial (commercial_id),
-    FOREIGN KEY (livraison_id) REFERENCES public.livraison (livraison_id)
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
 );
 
 -- Create commercial table with primary key
-CREATE TABLE public.commercial
+CREATE TABLE commercial
 (
     commercial_id INT PRIMARY KEY,
+    region_id INT,
     prenom VARCHAR (255),
     nom VARCHAR(255),
-    FOREIGN KEY (region_id) REFERENCES public.region (region_id)
+    FOREIGN KEY (region_id) REFERENCES region (region_id)
 );
 
 -- Create livraison table with primary key
-CREATE TABLE public.livraison
+CREATE TABLE livraison
 (
     livraison_id INT PRIMARY KEY,
     livraison VARCHAR (25)
 );
 
 -- Create region table with primary key
-CREATE TABLE public.region
+CREATE TABLE region
 (
     region_id INT PRIMARY KEY,
     region VARCHAR (255)
 );
 
 -- Create commande table with primary key
-CREATE TABLE public.commande
+CREATE TABLE commande
 (
     commande_id INT PRIMARY KEY,
+    client_id INT,
+    commercial_id INT,
+    livraison_id INT,
     date_commande DATE,
-    FOREIGN KEY (client_id) REFERENCES public.client (client_id),
-    FOREIGN KEY (commercial_id) REFERENCES public.client (commercial_id),
-    FOREIGN KEY (livraison_id) REFERENCES public.client (livraison_id)
+    FOREIGN KEY (client_id) REFERENCES client (client_id),
+    FOREIGN KEY (commercial_id) REFERENCES commercial (commercial_id),
+    FOREIGN KEY (livraison_id) REFERENCES livraison (livraison_id)
 );
 
 -- Create commande detail table with primary key
-CREATE TABLE public.commande_detail
+CREATE TABLE commande_detail
 (
     commande_detail_id INT PRIMARY KEY,
+    commande_id INT,
+    produit_id INT,
     quantite INT,
-    prix_unitaire NUMBER,
-    remise NUMBER,
-    prix_total NUMBER,
-    FOREIGN KEY (commande_id) REFERENCES public.commande (commande_id),
-    FOREIGN KEY (produit_id) REFERENCES public.produit (produit_id)
+    prix_unitaire NUMERIC,
+    remise NUMERIC,
+    prix_total NUMERIC,
+    FOREIGN KEY (commande_id) REFERENCES commande (commande_id),
+    FOREIGN KEY (produit_id) REFERENCES produit (produit_id)
 );
 
 -- Create product table with primary key
-CREATE TABLE public.produit
+CREATE TABLE produit
 (
     produit_id INT PRIMARY KEY,
+    sous_categorie_id INT,
     nom_produit VARCHAR(255),
     nom_scientifique VARCHAR(255),
-    prix NUMBER,
-    FOREIGN KEY (sous_categorie_id) REFERENCES public.sous_categorie (sous_categorie_id)
+    prix NUMERIC,
+    FOREIGN KEY (sous_categorie_id) REFERENCES sous_categorie (sous_categorie_id)
 );
 
 -- Create sub category table with primary key
-CREATE TABLE public.sous_categorie
+CREATE TABLE sous_categorie
 (
     sous_categorie_id INT PRIMARY KEY,
+    categorie_id INT,
     sous_categorie VARCHAR(255),
-    FOREIGN KEY (categorie_id) REFERENCES public.categorie (categorie_id)
+    FOREIGN KEY (categorie_id) REFERENCES categorie (categorie_id)
 );
 
 -- Create category table with primary key
-CREATE TABLE public.categorie
+CREATE TABLE categorie
 (
     categorie_id INT PRIMARY KEY,
     categorie VARCHAR(255)
@@ -84,12 +94,12 @@ CREATE TABLE public.categorie
 
 
 -- Set ownership of the tables to the postgres user
-ALTER TABLE public.client OWNER to postgres;
-ALTER TABLE public.commercial OWNER to postgres;
-ALTER TABLE public.livraison OWNER to postgres;
-ALTER TABLE public.region OWNER to postgres;
-ALTER TABLE public.commande OWNER to postgres;
-ALTER TABLE public.commande_detail OWNER to postgres;
-ALTER TABLE public.produit OWNER to postgres;
-ALTER TABLE public.sous_categorie OWNER to postgres;
-ALTER TABLE public.categorie OWNER to postgres;
+ALTER TABLE client OWNER to postgres;
+ALTER TABLE commercial OWNER to postgres;
+ALTER TABLE livraison OWNER to postgres;
+ALTER TABLE region OWNER to postgres;
+ALTER TABLE commande OWNER to postgres;
+ALTER TABLE commande_detail OWNER to postgres;
+ALTER TABLE produit OWNER to postgres;
+ALTER TABLE sous_categorie OWNER to postgres;
+ALTER TABLE categorie OWNER to postgres;
