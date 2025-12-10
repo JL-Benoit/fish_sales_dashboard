@@ -1,4 +1,4 @@
-# 📂 My Power BI sales Dashboard Portfolio 
+# 📂 My Power BI sales Dashboard Project
 ![gif_dashboard](images/cpe_dashboard.gif)
 
 This repository showcases my Power BI dashboard project and documents my learning journey, from building this report to designing advanced, interactive analytics. **The goal of this project is to transform raw data into visuals that communicate real meaning.**
