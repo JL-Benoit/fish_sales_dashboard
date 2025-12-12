@@ -3,13 +3,32 @@
 -- Determine the sales growth percentage (revenue change) between two periods (e.g., Q4 2023 vs. Q3 2023). (Requires date filtering and CTE/subquery).
 
 -- Using a Common Table Expression (CTE), find the client who placed their first order in a specific month (e.g., January 2024). Display the client's code_magasin and the date_commande.
-
+SELECT *
+FROM categorie
 -- Identify the Top 3 regions where the average discount rate (remise) offered was the highest. (Indicates aggressive discounting).
 
 -- Find the total sales (sum of prix_total) for each commercial, broken down by the category of the products they sold. (Requires conditional aggregation or advanced joins).
+SELECT
+    c.nom AS commercial_nom,
+    c.prenom AS commercial_prenom,
+    ROUND(SUM(CASE WHEN cat.categorie = 'poissons' THEN cd.prix_total ELSE 0 END), 2) AS poissons_sales,
+    ROUND(SUM(CASE WHEN cat.categorie = 'plantes & accessoires' THEN cd.prix_total ELSE 0 END), 2) AS plantes_accessoires_sales,
+    ROUND(SUM(CASE WHEN cat.categorie NOT IN ('poissons', 'plantes & accessoires') THEN cd.prix_total ELSE 0 END), 2) AS alimentation,
+    ROUND(SUM(cd.prix_total), 2) AS total_revenue
+FROM
+    commercial AS c
+INNER JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+INNER JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+INNER JOIN produit AS p ON cd.produit_id = p.produit_id
+INNER JOIN sous_categorie AS sc ON p.sous_categorie_id = sc.sous_categorie_id
+INNER JOIN categorie AS cat ON sc.categorie_id = cat.categorie_id
 
--- List the client_ids who have purchased products from at least three different regions (inferred through the commercial who handles them).
-
+GROUP BY
+    c.commercial_id,
+    c.nom,
+    c.prenom
+ORDER BY
+    total_revenue DESC;
 -- For each region, find the product category that generates the highest total revenue (the 'best-selling category per region').
 
 -- Calculate the median unit price (prix_unitaire) of all items sold in the commande_detail table.
