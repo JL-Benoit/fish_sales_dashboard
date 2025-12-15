@@ -147,3 +147,57 @@ SELECT
 FROM produit
 WHERE prix < 50
 ORDER BY prix ASC;
+
+/*Part 2: Simple Aggregation and Grouping
+Focus on using aggregate functions without joining tables.*/
+
+--What is the total number of unique products available in the produit table?
+SELECT 
+    COUNT(DISTINCT produit_id)
+FROM produit;
+
+--Calculate the average unit price (prix) across all products.
+SELECT
+    ROUND(AVG(prix),2) AS avg_prix
+FROM produit;
+
+--Find the highest unit price (prix) among all products.
+SELECT
+    MAX(prix) AS max_prix
+FROM produit;
+
+--Count the total number of orders (commande_id) placed in the commande table.
+SELECT
+    COUNT(commande_id)
+FROM commande;
+
+--Determine the total revenue (sum of prix_total) from all line items in the commande_detail table.
+SELECT
+    ROUND(SUM(prix_total),2) AS total_revenu
+FROM commande_detail;
+
+--Find the number of distinct categorie types available in the categorie table.
+SELECT
+    COUNT(DISTINCT categorie_id)
+FROM categorie;
+
+--How many commercials are listed in the database?
+SELECT
+    COUNT(DISTINCT commercial_id)
+FROM commercial;
+
+--Find the total quantity (quantite) of all items ever sold (commande_detail).
+SELECT
+    SUM(quantite) AS total_items
+FROM commande_detail;
+
+--Count the number of products that belong to the sous_categorie_id = 12.
+SELECT
+    COUNT(DISTINCT produit_id)
+FROM produit
+WHERE sous_categorie_id = '12';
+
+--What is the average quantity (quantite) of items sold per line item in the commande_detail table?
+SELECT
+    ROUND(AVG(quantite),2) AS avg_quantite_line
+FROM commande_detail;
