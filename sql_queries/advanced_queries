@@ -167,3 +167,98 @@ WHERE
     )
 ORDER BY
     average_spending DESC;
+
+
+/*Part 1: Multi-Table Joins and Advanced Filtering
+Focus on combining 3 or more tables and filtering results based on criteria from different tables.*/
+
+--List the product name (nom_produit), the category name (categorie), and the sub-category name (sous_categorie) for all products.
+SELECT
+    produit_id,
+    nom_produit,
+    categorie,
+    sous_categorie
+FROM produit
+LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
+LEFT JOIN categorie ON sous_categorie.categorie_id = categorie.categorie_id;
+
+--Find the nom and prenom of the commercial who sold the product named 'Cardinalis', and how much.
+SELECT 
+    commercial.nom,
+    commercial.prenom,
+    p.produit_id,
+    p.nom_produit,
+    SUM(cd.quantite) AS total_sold
+FROM commercial
+LEFT JOIN commande AS c ON commercial.commercial_id = c.commercial_id
+LEFT JOIN commande_detail AS cd ON c.commande_id = cd.commande_id
+LEFT JOIN produit AS p ON cd.produit_id = p.produit_id
+WHERE nom_produit LIKE '%ardinalis%'
+GROUP BY 
+    commercial.nom,
+    commercial.prenom,
+    p.produit_id,
+    p.nom_produit
+ORDER BY 
+    total_sold DESC;
+
+--Display the commande_id, the client_id, and the full name (nom and prenom) of the commercial responsible for the order.
+SELECT 
+    commande_id,
+    client_id,
+    nom,
+    prenom
+FROM commande
+LEFT JOIN commercial ON commande.commercial_id = commercial.commercial_id;
+
+--Find the nom_produit and the quantite sold for all orders placed by the client with the code_magasin of 'TRSTJO'.
+SELECT 
+    c.commande_id,
+    cd.produit_id,
+    p.nom_produit,
+    cd.quantite
+FROM commande_detail AS cd
+LEFT JOIN commande AS c ON cd.commande_id = c.commande_id
+LEFT JOIN client AS cl ON c.client_id = CL.client_id
+LEFT JOIN produit AS p ON cd.produit_id = p.produit_id;
+
+--List all orders (commande_id) that contain at least one product with a price (prix) greater than 30.00.
+SELECT 
+    c.commande_id,
+    client.code_magasin,
+    cd.produit_id,
+    p.nom_produit,
+    cd.prix_unitaire
+FROM commande AS c
+LEFT JOIN commande_detail AS cd ON c.commande_id = cd.commande_id
+LEFT JOIN produit AS p ON cd.produit_id = p.produit_id
+LEFT JOIN client ON c.client_id = client.client_id
+WHERE cd.prix_unitaire > '30';
+
+--Find the names of all products sold in the 'Sud' region & quantities sold.
+SELECT
+    p.produit_id,
+    p.nom_produit,
+    SUM(cd.quantite) AS total_sold,
+    r.region
+FROM produit AS p
+LEFT JOIN commande_detail AS cd ON p.produit_id = cd.produit_id
+LEFT JOIN commande AS c ON cd.commande_id = c.commande_id
+LEFT JOIN client ON c.client_id = client.client_id
+LEFT JOIN commercial ON client.commercial_id = commercial.commercial_id
+LEFT JOIN region AS r ON commercial.region_id = r.region_id
+WHERE region = 'Sud'
+GROUP BY
+    p.produit_id,
+    p.nom_produit,
+    r.region
+ORDER BY
+    p.produit_id ASC;
+
+--Display the nom_produit and the quantite sold for all products that belong to the category 'Fish'.
+
+--Retrieve the nom and prenom of all commercials who have placed an order in December 2023 (between '2023-12-01' and '2023-12-31').
+
+--List all products that have been sold, but were not sold in the quantity of exactly 5. (Filter on commande_detail.quantite).
+
+--Find the names of all clients who have placed an order using the delivery type 'Standard'.    
