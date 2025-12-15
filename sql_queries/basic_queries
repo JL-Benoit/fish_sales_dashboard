@@ -1,8 +1,11 @@
+--Basic test
+SELECT *
+FROM produit;
+
 -- What is the average unit price (prix) of all products currently listed in the inventory?
 SELECT 
     ROUND(AVG(prix),2) AS avg_prix
 FROM produit;
-
 
 -- List the prenom and nom of all commercials, and the region name they belong to.
 SELECT 
@@ -11,7 +14,6 @@ SELECT
     region.region
 FROM commercial
 LEFT JOIN region ON commercial.region_id = region.region_id
-
 
 -- Identify the most expensive product (nom_produit) currently offered.
 SELECT
@@ -23,19 +25,16 @@ WHERE prix IS NOT NULL
 ORDER BY prix DESC
 LIMIT 1;
 
-
 -- Find the total number of distinct regions covered by the sales team.
 SELECT
     DISTINCT COUNT(region)
 FROM region;
-
 
 -- How many orders (commande_id) were placed on a specific date (e.g., date_commande = '2023-10-15')?
 SELECT 
     COUNT(commande_id)
 FROM commande
 WHERE date_commande = '2025-09-04';
-
 
 -- Display the client_id, code_magasin, and associated commercial_id for quick client lookup.
 SELECT
@@ -47,12 +46,10 @@ SELECT
 FROM client
 LEFT JOIN commercial ON client.commercial_id = commercial.commercial_id
 
-
 -- List all product categories (categorie) to understand the breadth of the offering.
 SELECT 
     categorie
 FROM categorie;
-
 
 -- List all product sub-categories (sous_categorie) to understand the breadth of the offering.
 SELECT 
@@ -64,12 +61,10 @@ SELECT
     SUM(prix_total)
 FROM commande_detail;
 
-
 -- Which livraison (delivery) method is available with livraison_id = 11?
 SELECT *
 FROM livraison
 WHERE livraison_id = 11
-
 
 -- Retrieve the nom_produit and its scientific name for products belonging to the sub-category with sous_categorie_id 10.
 SELECT
@@ -81,7 +76,6 @@ SELECT
 FROM produit
 LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
 WHERE produit.sous_categorie_id = 10;
-
 
 
 /* Second set of questions:
@@ -201,3 +195,97 @@ WHERE sous_categorie_id = '12';
 SELECT
     ROUND(AVG(quantite),2) AS avg_quantite_line
 FROM commande_detail;
+
+
+/*Part 3: Basic Joins (INNER and LEFT)
+Focus on combining two tables using a common key.*/
+
+--List all commande_ids and the code_magasin of the client who placed each order. (Join commande and client).
+SELECT
+    commande_id,
+    code_magasin
+FROM commande
+LEFT JOIN client ON commande.client_id = client.client_id;
+
+--Display the nom and prenom of all commercials, alongside the region name they are assigned to. (Join commercial and region).
+SELECT
+    commercial_id,
+    nom,
+    prenom,
+    region
+FROM commercial
+LEFT JOIN region ON commercial.region_id = region.region_id;
+
+--Find the nom_produit and the sous_categorie name it belongs to. (Join produit and sous_categorie).
+SELECT 
+    p.produit_id,
+    p.nom_produit,
+    p.sous_categorie_id,
+    sous_categorie
+FROM produit AS p
+LEFT JOIN sous_categorie ON p.sous_categorie_id = sous_categorie.sous_categorie_id;
+
+--List the commande_id, the nom_produit, and the quantite sold for every line item. (Join commande_detail and produit).
+SELECT
+    cd.commande_id,
+    nom_produit,
+    cd.quantite
+FROM commande_detail AS cd
+LEFT JOIN produit ON cd.produit_id = produit.produit_id;
+
+--Find the total revenue (sum of prix_total) for all sales made by the commercial with commercial_id = 3. (Join commande and commande_detail, then filter).
+SELECT
+    c.commercial_id,
+    ROUND(SUM(cd.prix_total),2) AS total_revenu
+FROM commande AS c
+LEFT JOIN commande_detail AS cd ON c.commande_id = cd.commande_id
+GROUP BY c.commercial_id
+HAVING commercial_id = '3';
+
+--List the nom_produit and its unit price for all products belonging to the category named 'Poisson' (Requires joining to sous_categorie and categorie).
+SELECT
+    produit_id,
+    nom_produit,
+    prix,
+    sous_categorie,
+    categorie
+FROM produit
+LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
+LEFT JOIN categorie ON sous_categorie.categorie_id = categorie.categorie_id
+WHERE categorie LIKE 'poissons';
+
+--For all orders, show the commande_id, the date_commande, and the type of delivery (libelle) used. (Join commande and livraison).
+SELECT
+    commande_id,
+    date_commande,
+    livraison
+FROM commande
+LEFT JOIN livraison ON commande.livraison_id = livraison.livraison_id;
+
+--Use a LEFT JOIN to list all products (nom_produit), and for products that have been ordered, show the order quantite. Include products that have not been ordered. (Join produit and commande_detail).
+SELECT
+    produit.produit_id,
+    produit.nom_produit,
+    commande_detail.quantite
+FROM produit
+LEFT JOIN commande_detail ON produit.produit_id = commande_detail.produit_id
+ORDER BY
+    produit.produit_id;
+
+--Find the total number of sales (count of commande_id) attributed to each commercial_id. (Join commande and commercial, then group).
+SELECT
+    COUNT(commande_id) AS total_sales,
+    commercial.nom,
+    commercial.prenom
+FROM commande
+LEFT JOIN commercial ON commande.commercial_id = commercial.commercial_id
+GROUP BY 
+    commercial.nom,
+    commercial.prenom;
+
+--List the Top 5 most expensive products by price, showing the nom_produit and prix. (Select from produit, order, and limit).
+SELECT *
+FROM produit
+WHERE prix IS NOT NULL
+ORDER BY prix DESC
+LIMIT 5;
