@@ -81,3 +81,69 @@ SELECT
 FROM produit
 LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
 WHERE produit.sous_categorie_id = 10;
+
+
+
+/* Second set of questions:
+Part 1: Single Table Queries (SELECT, FROM, WHERE, ORDER BY)
+Focus on extracting and filtering data from a single entity table. */
+
+--List the full details (all columns) for all entries in the produit (product) table.
+SELECT *
+FROM produit;
+
+--Retrieve only the nom and prenom of all sales commercials.
+SELECT
+    nom,
+    prenom
+FROM commercial;
+
+--Display the region names and their associated region_id.
+SELECT
+    region_id,
+    region
+FROM region;
+
+--Find the code_magasin for all clients listed in the client table.
+SELECT
+    client_id,
+    code_magasin
+FROM client;
+
+--List all product names (nom_produit) and their unit prices (prix) from the produit table.
+SELECT
+    produit_id,
+    nom_produit,
+    prix
+FROM produit;
+
+--Find the details of the product with the produit_id of 'AL1306'.
+SELECT *
+FROM produit
+WHERE produit_id = 'AL1306';
+
+--Display all orders (commande_id) that were placed on the date '2025-11-07'.
+SELECT *
+FROM commande
+WHERE date_commande = '2025-11-07';
+
+--List the client_id and date_commande for all orders placed after the year 2023 (e.g., after '2023-12-31').
+SELECT
+    client_id,
+    date_commande
+FROM commande
+WHERE date_commande > '2023-12-31';
+
+--Find all commercials whose last name (nom) starts with the letter 'P'.
+SELECT *
+FROM commercial
+WHERE nom LIKE 'P';
+
+--Retrieve the nom_produit and prix of all products that cost less than 50.00, sorted from lowest to highest price.
+SELECT
+    produit_id,
+    nom_produit,
+    prix
+FROM produit
+WHERE prix < 50
+ORDER BY prix ASC;
