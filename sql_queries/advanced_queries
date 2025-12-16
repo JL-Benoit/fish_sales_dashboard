@@ -454,10 +454,48 @@ WHERE
 ORDER BY
     cmd.date_commande DESC;
 
---Conditional Logic: Count the total number of orders that used the delivery type 'Express' and the total number that used 'Standard', displaying them as two separate columns. (Requires SUM(CASE WHEN...)).
+--Count the total number of orders that used the delivery type 'EXNA' and the total number that used 'BRNO', displaying them as two separate columns. (Requires SUM(CASE WHEN...)).
+SELECT
+SUM(CASE WHEN livraison = 'EXNA' THEN 1 END) AS EXNA,
+SUM(CASE WHEN livraison = 'BRNO' THEN 1 END) AS BRNO
+FROM livraison
+LEFT JOIN commande ON livraison.livraison_id = commande.livraison_id;
 
---Subquery/Filtering: Find the commercial_id of the commercial who generated the most total revenue.
-
+--Find the commercial_id of the commercial who generated the most total revenue.
+SELECT
+    c.commercial_id,
+    c.nom,
+    c.prenom,
+    T1.total_revenue 
+FROM
+    commercial AS c
+LEFT JOIN (
+    -- Subquery 1 STARTS
+    SELECT
+        c.commercial_id,
+        ROUND(COALESCE(SUM(cd.prix_total), 0), 2) AS total_revenue 
+    FROM commercial AS c
+    LEFT JOIN client AS cl ON c.commercial_id = cl.commercial_id
+    LEFT JOIN commande AS cmd ON cl.client_id = cmd.client_id
+    LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+    GROUP BY
+        c.commercial_id -- Subquery 1 ENDS
+) AS T1 ON c.commercial_id = T1.commercial_id
+WHERE
+    T1.total_revenue = (
+        -- Subquery 2 STARTS
+        SELECT MAX(T2.total_revenue)
+        FROM (
+            SELECT
+                ROUND(COALESCE(SUM(cd.prix_total), 0), 2) AS total_revenue
+            FROM commercial AS c
+            LEFT JOIN client AS cl ON c.commercial_id = cl.commercial_id
+            LEFT JOIN commande AS cmd ON cl.client_id = cmd.client_id
+            LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+            GROUP BY c.commercial_id 
+        ) AS T2 -- Subquery 2 ENDS
+    );
+    
 --Complex HAVING: Find all client_ids who have spent an average of over 500.00 per line item, but only include clients who have placed at least 5 order line items total.
 
 --Subquery/Filtering: List the names of all clients who have ordered a product that costs more than the average product price.
