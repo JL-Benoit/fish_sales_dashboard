@@ -256,9 +256,41 @@ ORDER BY
     p.produit_id ASC;
 
 --Display the nom_produit and the quantite sold for all products that belong to the category 'Fish'.
+SELECT
+    p.produit_id,
+    nom_produit,
+    quantite,
+    categorie
+FROM produit AS p
+LEFT JOIN sous_categorie ON p.sous_categorie_id = sous_categorie.sous_categorie_id
+LEFT JOIN categorie ON sous_categorie.categorie_id = categorie.categorie_id
+LEFT JOIN commande_detail ON p.produit_id = commande_detail.produit_id
+WHERE categorie LIKE 'poissons'
+ORDER BY
+    p.produit_id ASC;
 
---Retrieve the nom and prenom of all commercials who have placed an order in December 2023 (between '2023-12-01' and '2023-12-31').
+--List all products that have been sold, but were not sold in the quantity of exactly 8. 
+SELECT
+    p.produit_id,
+    nom_produit,
+    SUM(cd.quantite) AS total_sold
+FROM commande_detail AS cd
+LEFT JOIN produit AS p ON cd.produit_id = p.produit_id
+GROUP BY
+    p.produit_id,
+    nom_produit
+HAVING 
+    SUM(cd.quantite) <> 8
+ORDER BY
+    p.produit_id ASC;
 
---List all products that have been sold, but were not sold in the quantity of exactly 5. (Filter on commande_detail.quantite).
-
---Find the names of all clients who have placed an order using the delivery type 'Standard'.    
+--Find the names of all clients who have placed an order using the delivery type 'EXNA'.  
+SELECT
+    client_id,
+    code_magasin,
+    livraison
+FROM client
+LEFT JOIN livraison ON client.livraison_id = livraison.livraison_id
+WHERE livraison = 'EXNA'
+ORDER BY
+    client_id ASC;
