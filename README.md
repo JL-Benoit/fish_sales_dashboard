@@ -42,7 +42,7 @@ This dashboard was built to provide managers with fast, meaningful, and interact
 # 📊 Data Model (ERD)
 To structure the dataset effectively, I designed a schema and built an Entity Relationship Diagram (ERD) to clarify relationships and ensure efficient querying. 
 
-![ERD_Image](images/final_erd_cpe_dashboard.drawio.png)
+![ERD_Image](images/final_erd_dashboard.png)
 
 
 # 🔍 The dashboard 
