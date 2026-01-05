@@ -3,10 +3,10 @@ SELECT
     nom_produit, 
     nom_scientifique
 FROM produit
-WHERE produit_ID NOT IN (
-    SELECT produit_ID 
+WHERE produit_id NOT IN (
+    SELECT produit_id 
     FROM commande_detail 
-    WHERE produit_ID IS NOT NULL
+    WHERE produit_id IS NOT NULL
 );
 
 -- List all products whose price is strictly greater than the average price of all products in the database.
@@ -21,4 +21,99 @@ WHERE prix > (
     FROM produit
     WHERE produit_ID IS NOT NULL
 )
-ORDER BY produit_id ASC;
+ORDER BY produit_id DESC;
+
+-- Identify the nom_produit and prix of products that have never been sold with a discount (remise) greater than 10% (0.10), but have been sold at least once.
+
+SELECT 
+nom_produit,
+prix
+FROM produit
+WHERE produit_id IN (
+    SELECT produit_id 
+    FROM commande_detail 
+    WHERE produit_id IS NOT NULL
+)
+AND produit_id NOT IN (
+    SELECT
+    produit_id
+    FROM commande_detail
+    WHERE remise >0.10
+);
+
+-- Find the nom and prenom of the commercial (or commercials) who have the highest number of distinct clients assigned to them.
+SELECT 
+nom, 
+prenom
+FROM commercial 
+WHERE (
+    SELECT 
+    COUNT(DISTINCT client_id) 
+    FROM client 
+    WHERE commercial_id = commercial.commercial_id
+) = (
+    SELECT 
+    MAX(count_per_commercial)
+    FROM (
+        SELECT 
+        COUNT(DISTINCT client_id) AS count_per_commercial
+        FROM client
+        GROUP BY commercial_id
+    )
+);
+
+-- Find the nom_produit and prix of the product(s) that have the highest prix_unitaire ever recorded in the commande_detail table.
+SELECT
+nom_produit,
+prix
+FROM produit
+WHERE prix = (
+    SELECT
+    MAX(prix_unitaire)
+    FROM commande_detail
+);
+
+-- Identify the nom_produit of products whose total quantity sold (sum of quantite) is higher than the average total quantity sold of all products.
+SELECT
+nom_produit
+FROM produit
+JOIN (
+    SELECT produit_id, 
+    SUM(quantite) as total_quantite 
+    FROM commande_detail 
+    GROUP BY produit_id
+) AS sub_quant ON produit.produit_id = sub_quant.produit_id
+WHERE sub_quant.total_quantite > (
+    SELECT 
+    AVG(total_vendu) 
+    FROM (
+        SELECT 
+        SUM(quantite) as total_vendu 
+        FROM commande_detail 
+        GROUP BY produit_id) 
+);
+
+--Identify the code_magasin and email of all clients - who have  - never placed an order using the delivery method 'EXNA'.
+SELECT 
+    code_magasin, 
+    email
+FROM client c
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM commande AS cmd
+    JOIN livraison AS l ON cmd.livraison_id = l.livraison_id
+    WHERE cmd.client_id = c.client_id
+      AND l.livraison = 'EXNA'
+);
+
+-- Find the nom_produit and prix of products that have never been sold (they do not appear in the commande_detail table).
+SELECT
+    nom_produit,
+    prix
+FROM produit AS p
+WHERE NOT EXISTS (
+    SELECT 
+    produit_id 
+    FROM commande_detail AS cd
+    WHERE cd.produit_id = p.produit_id
+);
