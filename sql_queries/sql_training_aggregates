@@ -1,0 +1,12 @@
+-- Calculate three things from the commande_detail table in a single query: 
+-- The total number of items sold. 
+-- The average price per item sold.
+-- The highest price ever paid for a single item.
+SELECT 
+    SUM(quantite) AS total_sold_items,
+    ROUND(AVG(prix_unitaire),3) AS average_item_price,
+    MAX(prix_unitaire) AS highest_price
+FROM commande_detail;
+
+
+-- 
