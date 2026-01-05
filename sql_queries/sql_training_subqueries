@@ -1,0 +1,24 @@
+-- Identify all products that have never been included in any order.
+SELECT 
+    nom_produit, 
+    nom_scientifique
+FROM produit
+WHERE produit_ID NOT IN (
+    SELECT produit_ID 
+    FROM commande_detail 
+    WHERE produit_ID IS NOT NULL
+);
+
+-- List all products whose price is strictly greater than the average price of all products in the database.
+SELECT 
+produit_id,
+nom_produit,
+prix
+FROM produit
+WHERE prix > (
+    SELECT
+    AVG(prix)
+    FROM produit
+    WHERE produit_ID IS NOT NULL
+)
+ORDER BY produit_id ASC;
