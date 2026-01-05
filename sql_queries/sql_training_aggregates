@@ -9,4 +9,97 @@ SELECT
 FROM commande_detail;
 
 
--- 
+-- Find the total quantity of products sold for each order.
+SELECT
+    commande_id,
+    SUM(quantite) AS total_quantite_par_commande
+FROM commande_detail
+GROUP BY commande_id
+ORDER BY commande_id;
+
+
+--Find the produit_id of products that have been sold more than 100 times in total (sum of quantite).
+SELECT 
+    produit_id,
+    SUM(quantite) AS sum_quant
+FROM commande_detail
+GROUP BY 
+    produit_id
+HAVING SUM(quantite) > 100
+ORDER BY sum_quant DESC;
+
+
+--Find the commande_id and the total number of distinct products for orders that contain more than 30 different products.
+SELECT 
+    commande_id,
+    COUNT(DISTINCT produit_id) AS distinct_products_bought
+FROM commande_detail
+GROUP BY commande_id
+HAVING COUNT(DISTINCT produit_id) > 30
+ORDER BY distinct_products_bought DESC;
+
+
+--Find the average quantity of products per order, but only for orders that have a total quantity of items greater than 100.
+SELECT
+    commande_id,
+    ROUND(AVG(quantite),2) AS avg_quant
+FROM commande_detail
+GROUP BY commande_id
+HAVING SUM(quantite) > 100
+ORDER BY avg_quant DESC;
+
+
+--  Find the commande_id for orders that have a total quantity of more than 100 units, but ignore any items that were sold in quantities of less than 5.
+SELECT
+    commande_id,
+    SUM(quantite) AS sum_quant
+FROM commande_detail
+WHERE quantite >= 5
+GROUP BY commande_id
+HAVING SUM(quantite) > 100
+ORDER BY commande_id ASC; 
+
+
+-- Find the commande_id for orders that span 10 or more unique produit_ids.
+SELECT
+    commande_id,
+    COUNT(DISTINCT produit_id) AS produit_distinct
+FROM commande_detail
+GROUP BY commande_id
+HAVING COUNT(DISTINCT produit_id) > 10
+ORDER BY commande_id ASC;
+
+
+-- For each commande_id, calculate: The total number of rows (lines) in the order - The number of lines where the quantite is 10 or more.
+SELECT
+    commande_id,
+    COUNT(*) AS total_lines,
+    SUM(CASE WHEN quantite >= 10 THEN 1 ELSE 0 END) AS num_lines_over_10
+FROM commande_detail
+GROUP BY commande_id
+ORDER BY commande_id ASC;
+
+
+-- For each order, calculate the percentage of lines that are "Bulk Lines" (where quantite >= 20).
+SELECT
+    commande_id,
+    COUNT(*) AS total_lines,
+    ROUND(SUM(CASE WHEN quantite >= 20 THEN 1 ELSE 0 END)* 100.0 / COUNT(*),2) AS percent_over_20
+FROM commande_detail
+GROUP BY commande_id
+HAVING ROUND(SUM(CASE WHEN quantite >= 20 THEN 1 ELSE 0 END)* 100.0 / COUNT(*),2) > 0
+ORDER BY commande_id ASC;
+
+
+--Calculate the sum of total_commande from the commande table joined with the commercial and region tables.
+SELECT
+    COALESCE(region, 'GLOBAL') AS region_label, 
+    COALESCE(nom, '--- Subtotal ---') AS commercial_label,
+    SUM(prix_totaL) AS total_sales
+FROM commande_detail
+LEFT JOIN commande ON commande_detail.commande_id = commande.commande_id
+LEFT JOIN commercial ON commande.commercial_id = commercial.commercial_id
+LEFT JOIN region ON commercial.region_id = region.region_id
+GROUP BY ROLLUP (region, nom);
+
+
