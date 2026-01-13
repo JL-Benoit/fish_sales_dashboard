@@ -185,6 +185,7 @@ LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
 GROUP BY r.region;
 
 
+
 -- Generate a report showing a list of all Commercials by their name (prenom and nom). Calculate:
 --total_orders: The total count of orders (commande) they have handled.
 -- high_value_orders: The count of orders they have handled that were placed in the year 2025.
@@ -200,6 +201,7 @@ GROUP BY
     prenom,
     nom
 ORDER BY total_orders DESC;
+
 
 
 /*Generate a list of all Regions (region). 
@@ -227,6 +229,7 @@ LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
 LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
 LEFT JOIN livraison AS l ON cmd.livraison_id = l.livraison_id
 GROUP BY r.region;
+
 
 
 /*Generate a report for all Categories (categorie). For each category, calculate the following two metrics:
@@ -258,3 +261,45 @@ LEFT JOIN commande_detail AS cd ON produit.produit_id = cd.produit_id
 WHERE categorie.categorie = 'poissons'
 GROUP BY 
     CASE  WHEN remise > 0 THEN 'Discounted' ELSE 'Full Price' END;
+
+
+
+/*For every Region (region), calculate:
+total_region_revenue: The sum of prix_total.
+poisson_revenue: The sum of prix_total where the categorie is 'Poissons'.
+poisson_percentage: (poisson_revenue / total_region_revenue) * 100.*/
+
+SELECT 
+    r.region,
+    ROUND(SUM(prix_total),2) AS total_region_revenue,
+    ROUND(COALESCE(SUM(prix_total) FILTER(WHERE categorie = 'poissons'),0),2) AS poisson_revenue,
+    ROUND((COALESCE(SUM(prix_total) FILTER (WHERE categorie = 'poissons'), 0) * 100.0) / NULLIF(SUM(prix_total), 0)::numeric, 2) AS poisson_percentage
+FROM region AS r
+LEFT JOIN commercial AS c ON r.region_id = c.region_id
+LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+LEFT JOIN produit AS p ON cd.produit_id =p.produit_id
+LEFT JOIN sous_categorie AS sc ON p.sous_categorie_id = sc.sous_categorie_id
+LEFT JOIN categorie ON sc.categorie_id = categorie.categorie_id
+GROUP BY r.region;
+
+
+
+/*For every Region (region), calculate the total units sold (quantite) for these three scenarios:
+    premium_fish_units: Total quantity where categorie = 'Poissons' AND prix_unitaire > 100 (The "Showroom" specimens).
+    promo_fish_units: Total quantity where categorie = 'Poissons' AND remise > 0 (The "Sales" tank).
+    bulk_supply_units: Total quantity where quantite > 20 AND prix_unitaire < 10 (The "Wholesale Staples" like food or basic gravel).*/
+
+SELECT
+    r.region,
+    COALESCE(SUM(quantite) FILTER(WHERE categorie.categorie = 'poissons' AND prix_unitaire > 40),0) AS premium_fish_units,
+    COALESCE(SUM(quantite) FILTER(WHERE categorie.categorie = 'poissons' AND remise > 0),0) AS promo_fish_units,
+    COALESCE(SUM(quantite) FILTER(WHERE quantite > 20 AND prix_unitaire <10),0) AS bulk_supply_units
+FROM region AS r
+LEFT JOIN commercial AS c ON r.region_id = c.region_id
+LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+LEFT JOIN produit AS p ON cd.produit_id =p.produit_id
+LEFT JOIN sous_categorie AS sc ON p.sous_categorie_id = sc.sous_categorie_id
+LEFT JOIN categorie ON sc.categorie_id = categorie.categorie_id
+GROUP BY r.region;
