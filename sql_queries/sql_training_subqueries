@@ -64,8 +64,9 @@ WHERE (
 
 -- Find the nom_produit and prix of the product(s) that have the highest prix_unitaire ever recorded in the commande_detail table.
 SELECT
-nom_produit,
-prix
+    produit_id,
+    nom_produit,
+    prix
 FROM produit
 WHERE prix = (
     SELECT
@@ -117,3 +118,125 @@ WHERE NOT EXISTS (
     FROM commande_detail AS cd
     WHERE cd.produit_id = p.produit_id
 );
+
+
+
+-- Find the Average Total Order Value for each commercial.
+
+SELECT 
+    order_totals.commercial_id, 
+    ROUND(AVG(order_sum), 2) AS avg_order_value
+FROM (
+    SELECT 
+        commande.commercial_id, 
+        cd.commande_id,
+        SUM(prix_total) AS order_sum
+    FROM commande_detail AS cd
+    JOIN commande ON cd.commande_id = commande.commande_id
+    GROUP BY 
+        cd.commande_id,
+        commande.commercial_id
+) AS order_totals
+
+GROUP BY order_totals.commercial_id
+ORDER BY order_totals.commercial_id ASC;
+
+
+-- Modify your previous query to only show commercials whose avg_order_value is greater than 300.
+
+SELECT 
+    order_totals.commercial_id, 
+    ROUND(AVG(order_sum), 2) AS avg_order_value
+FROM (
+    SELECT 
+        commande.commercial_id, 
+        cd.commande_id,
+        SUM(prix_total) AS order_sum
+    FROM commande_detail AS cd
+    JOIN commande ON cd.commande_id = commande.commande_id
+    GROUP BY 
+        cd.commande_id,
+        commande.commercial_id
+) AS order_totals
+GROUP BY order_totals.commercial_id
+HAVING AVG(order_sum) > 300
+ORDER BY order_totals.commercial_id ASC;
+
+
+-- Find the Global Average Order Value for the entire company and show it next to each commercial's individual AOV.
+SELECT 
+    commercial_id, 
+    ROUND(AVG(order_sum), 2) AS commercial_aov,
+    (SELECT ROUND(AVG(total), 2) FROM (SELECT SUM(prix_total) AS total FROM commande_detail GROUP BY commande_id) AS sub) AS global_aov
+FROM (
+    SELECT 
+        commande.commercial_id, 
+        cd.commande_id,
+        SUM(prix_total) AS order_sum
+    FROM commande_detail AS cd
+    JOIN commande ON cd.commande_id = commande.commande_id
+    GROUP BY 
+        cd.commande_id,
+        commande.commercial_id
+) AS order_totals
+GROUP BY order_totals.commercial_id
+HAVING AVG(order_sum) > 300
+ORDER BY order_totals.commercial_id ASC;
+
+
+/*For each commercial, calculate their "Concentration Ratio." 
+This is the percentage of their total revenue that comes from their top-selling product (by revenue).*/
+
+SELECT 
+    order_totals.commercial_id, 
+    ROUND(SUM(order_sum), 2) AS total_order_value,
+    ROUND((MAX(order_sum)::decimal / SUM(order_sum)),3) AS concentration_ratio
+FROM (
+    SELECT 
+        commande.commercial_id, 
+        cd.produit_id,
+        SUM(prix_total) AS order_sum
+    FROM commande_detail AS cd
+    JOIN commande ON cd.commande_id = commande.commande_id
+    GROUP BY 
+        cd.produit_id,
+        commande.commercial_id
+    )AS order_totals
+GROUP BY order_totals.commercial_id
+ORDER BY order_totals.commercial_id ASC;
+
+
+--Find the nom_produit of all products that have never been ordered.
+
+SELECT
+    produit_id,
+    nom_produit
+FROM produit
+WHERE produit_id NOT IN (
+    SELECT
+    produit_id
+    FROM commande_detail
+    WHERE produit_id IS NOT NULL
+);
+
+
+-- Find the client_id of all clients who have NEVER ordered a product that is NOT in the 'Poissons' category.
+SELECT
+    client.client_id,
+    code_magasin
+FROM client
+WHERE client_id NOT IN
+    (
+    SELECT 
+    DISTINCT cmd.client_id 
+    FROM commande AS cmd
+    JOIN commande_detail cd ON cmd.commande_id = cd.commande_id
+    LEFT JOIN produit ON cd.produit_id = produit.produit_id
+    LEFT JOIN sous_categorie ON produit.sous_categorie_id = sous_categorie.sous_categorie_id
+    LEFT JOIN categorie ON sous_categorie.categorie_id = categorie.categorie_id
+    WHERE categorie.categorie != 'poissons'
+    ) AND client.client_id IN (SELECT client_id FROM commande)
+GROUP BY 
+    client.client_id,
+    code_magasin
+ORDER BY client.client_id;
