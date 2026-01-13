@@ -1,7 +1,7 @@
--- Calculate three things from the commande_detail table in a single query: 
--- The total number of items sold. 
--- The average price per item sold.
--- The highest price ever paid for a single item.
+/*Calculate three things from the commande_detail table in a single query: 
+The total number of items sold. 
+The average price per item sold.
+The highest price ever paid for a single item.*/
 SELECT 
     SUM(quantite) AS total_sold_items,
     ROUND(AVG(prix_unitaire),3) AS average_item_price,
@@ -171,9 +171,9 @@ GROUP BY categorie
 ORDER BY total_revenu DESC;
 
 
--- Generate a report that shows each Region Name (region) and two calculated columns:
--- High_Value_Revenue: The sum of prix_total where the prix_unitaire is greater than or equal to 100.
--- Standard_Revenue: The sum of prix_total where the prix_unitaire is less than 100.
+/*Generate a report that shows each Region Name (region) and two calculated columns:
+    High_Value_Revenue: The sum of prix_total where the prix_unitaire is greater than or equal to 100.
+    Standard_Revenue: The sum of prix_total where the prix_unitaire is less than 100.*/
 SELECT 
     r.region,
     ROUND(COALESCE(SUM(cd.prix_total) FILTER(WHERE cd.prix_unitaire >= 100),0),2)  AS "revenu_de_prix_unitaire >= 100",
@@ -186,9 +186,9 @@ GROUP BY r.region;
 
 
 
--- Generate a report showing a list of all Commercials by their name (prenom and nom). Calculate:
---total_orders: The total count of orders (commande) they have handled.
--- high_value_orders: The count of orders they have handled that were placed in the year 2025.
+/*Generate a report showing a list of all Commercials by their name (prenom and nom). Calculate:
+    total_orders: The total count of orders (commande) they have handled.
+    high_value_orders: The count of orders they have handled that were placed in the year 2025.*/
 
 SELECT
     prenom,
@@ -205,7 +205,8 @@ ORDER BY total_orders DESC;
 
 
 /*Generate a list of all Regions (region). 
-For each region, calculate the total revenue (sum of prix_total from commande_detail) categorized by the delivery method (livraison) with UPS and NAZA.*/
+    For each region, calculate the total revenue (sum of prix_total from commande_detail) categorized by the delivery method (livraison) 
+    with UPS and NAZA.*/
 
 SELECT
     r.region,
@@ -265,9 +266,9 @@ GROUP BY
 
 
 /*For every Region (region), calculate:
-total_region_revenue: The sum of prix_total.
-poisson_revenue: The sum of prix_total where the categorie is 'Poissons'.
-poisson_percentage: (poisson_revenue / total_region_revenue) * 100.*/
+    total_region_revenue: The sum of prix_total.
+    poisson_revenue: The sum of prix_total where the categorie is 'Poissons'.
+    poisson_percentage: (poisson_revenue / total_region_revenue) * 100.*/
 
 SELECT 
     r.region,
@@ -303,3 +304,35 @@ LEFT JOIN produit AS p ON cd.produit_id =p.produit_id
 LEFT JOIN sous_categorie AS sc ON p.sous_categorie_id = sc.sous_categorie_id
 LEFT JOIN categorie ON sc.categorie_id = categorie.categorie_id
 GROUP BY r.region;
+
+
+
+--For each Commercial, calculate how many order lines fall into different "Volume Tiers" based on the quantity of items sold in that specific line.
+
+SELECT
+    prenom,
+    nom,
+    COALESCE(COUNT(quantite) FILTER(WHERE quantite BETWEEN 1 AND 5),0) AS retail_lines,
+    COALESCE(COUNT(quantite) FILTER(WHERE quantite BETWEEN 6 AND 50),0) AS wholesale_lines,
+    COALESCE(COUNT(quantite) FILTER(WHERE quantite > 50),0) AS bulk_export_lines
+FROM commercial AS c
+LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+GROUP BY
+    prenom,
+    nom;
+
+
+--Calculate the Revenue Efficiency of each Commercial. We want to see their total revenue, but we also want to see how much of that revenue came from their single most expensive line item.
+
+SELECT
+    prenom,
+    nom, 
+    ROUND(SUM(prix_total),2) AS total_revenue, 
+    MAX(prix_total) AS max_single_line_value
+FROM commercial AS c
+LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+GROUP BY
+    prenom,
+    nom;
