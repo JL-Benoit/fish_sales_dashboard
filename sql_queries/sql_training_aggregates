@@ -183,3 +183,78 @@ LEFT JOIN commercial AS c ON r.region_id = c.region_id
 LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
 LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
 GROUP BY r.region;
+
+
+-- Generate a report showing a list of all Commercials by their name (prenom and nom). Calculate:
+--total_orders: The total count of orders (commande) they have handled.
+-- high_value_orders: The count of orders they have handled that were placed in the year 2025.
+
+SELECT
+    prenom,
+    nom,
+COUNT(commande_id) AS total_orders,
+COUNT(commande_id) FILTER (WHERE EXTRACT(YEAR FROM date_commande) = 2025) AS high_value_orders
+FROM commercial
+LEFT JOIN commande ON commercial.commercial_id = commande.commercial_id
+GROUP BY 
+    prenom,
+    nom
+ORDER BY total_orders DESC;
+
+
+/*Generate a list of all Regions (region). 
+For each region, calculate the total revenue (sum of prix_total from commande_detail) categorized by the delivery method (livraison) with UPS and NAZA.*/
+
+SELECT
+    r.region,
+    COALESCE(SUM(CASE WHEN livraison.livraison = 'UPS' THEN prix_total ELSE 0 END),0) AS revenue_ups,
+    COALESCE(SUM(CASE WHEN livraison.livraison = 'EXNA' THEN prix_total ELSE 0 END),0) AS revenue_exna
+FROM region AS r
+LEFT JOIN commercial ON r.region_id = commercial.region_id
+LEFT JOIN commande ON commercial.commercial_id = commande.commercial_id
+LEFT JOIN commande_detail ON commande.commande_id = commande_detail.commande_id
+LEFT JOIN livraison ON commande.livraison_id = livraison.livraison_id
+GROUP BY r.region;
+
+-- With FILTER instead of CASE(WHEN)
+SELECT
+    r.region,
+    COALESCE(SUM(prix_total) FILTER (WHERE l.livraison = 'UPS'), 0) AS revenue_ups,
+    COALESCE(SUM(prix_total) FILTER (WHERE l.livraison = 'NAZA'), 0) AS revenue_naza
+FROM region AS r
+LEFT JOIN commercial AS c ON r.region_id = c.region_id
+LEFT JOIN commande AS cmd ON c.commercial_id = cmd.commercial_id
+LEFT JOIN commande_detail AS cd ON cmd.commande_id = cd.commande_id
+LEFT JOIN livraison AS l ON cmd.livraison_id = l.livraison_id
+GROUP BY r.region;
+
+
+/*Generate a report for all Categories (categorie). For each category, calculate the following two metrics:
+        avg_discounted_price: The average prix_unitaire for items where a discount (remise) was applied (i.e., remise is greater than 0).
+        avg_full_price: The average prix_unitaire for items where no discount was applied (i.e., remise is 0 OR remise is NULL). */
+
+SELECT 
+    categorie, 
+    ROUND(COALESCE(AVG(prix_unitaire) FILTER(WHERE remise > 0),0),2) AS avg_discounted_price, 
+    ROUND(COALESCE(AVG(prix_unitaire) FILTER(WHERE remise = 0 OR remise IS NULL),0),2) AS avg_full_price
+FROM categorie
+LEFT JOIN sous_categorie ON categorie.categorie_id = sous_categorie.categorie_id
+LEFT JOIN produit ON sous_categorie.sous_categorie_id = produit.sous_categorie_id
+LEFT JOIN commande_detail ON produit.produit_id = commande_detail.produit_id
+GROUP BY categorie
+ORDER BY avg_full_price DESC;
+
+-- Investigation of weird results:
+SELECT
+    CASE WHEN remise > 0 THEN 'Discounted' ELSE 'Full Price' END AS pricing_category,
+    COUNT(*) AS item_count,
+    MIN(cd.prix_unitaire) AS min_price,
+    MAX(cd.prix_unitaire) AS max_price,
+    ROUND(AVG(cd.prix_unitaire),2) AS avg_price
+FROM categorie
+LEFT JOIN sous_categorie ON categorie.categorie_id = sous_categorie.categorie_id
+LEFT JOIN produit ON sous_categorie.sous_categorie_id = produit.sous_categorie_id
+LEFT JOIN commande_detail AS cd ON produit.produit_id = cd.produit_id
+WHERE categorie.categorie = 'poissons'
+GROUP BY 
+    CASE  WHEN remise > 0 THEN 'Discounted' ELSE 'Full Price' END;
