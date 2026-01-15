@@ -240,3 +240,47 @@ GROUP BY
     client.client_id,
     code_magasin
 ORDER BY client.client_id;
+
+
+
+/*For every product, display the nom_produit and a column called status.
+If the product has sold more than the average quantity of all products, label it 'Bestseller'.
+Otherwise, label it 'Standard'.*/
+
+SELECT 
+    produit_id,
+    nom_produit,
+    CASE 
+        WHEN COALESCE((SELECT SUM(quantite) FROM commande_detail WHERE produit_id = p.produit_id), 0) = 0 
+            THEN 'Dead Stock'
+        WHEN (SELECT SUM(quantite) FROM commande_detail WHERE produit_id = p.produit_id) > 
+             (SELECT AVG(total_produit) FROM (SELECT SUM(quantite) AS total_produit FROM commande_detail GROUP BY produit_id) AS sub) 
+            THEN 'Bestseller'
+        ELSE 'Standard'
+    END AS status
+FROM produit AS p;
+
+
+--For each product, count how many other products have a higher total revenue than it does.
+
+SELECT 
+    p.produit_id,
+    p.nom_produit,
+    (
+        SELECT SUM(prix_total) FROM commande_detail WHERE produit_id = p.produit_id
+    ) AS total_revenue,
+    (
+        SELECT COUNT(*) + 1
+        FROM (
+            SELECT produit_id, SUM(prix_total) AS rev 
+            FROM commande_detail 
+            GROUP BY produit_id
+        ) AS others
+        WHERE others.rev > COALESCE((
+            SELECT SUM(prix_total) 
+            FROM commande_detail 
+            WHERE produit_id = p.produit_id
+        ),0)
+    ) AS revenue_rank
+FROM produit p
+ORDER BY revenue_rank ASC;
